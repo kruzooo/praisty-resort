@@ -89,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const targets = Array.from(document.querySelectorAll([
+        'main',
         'main > section',
         'main > article',
         'body > section:not(:first-of-type)',

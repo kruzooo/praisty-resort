@@ -40,6 +40,6 @@
     <footer class="bg-primary py-8 text-center text-sm text-white">
         <p>© {{ date('Y') }} Praisty Resort &amp; Spa. All rights reserved.</p>
     </footer>
-</body>
+<script src="{{ asset('js/app.js') }}?v=202609280945"></script></body>
 </html>
 

@@ -72,6 +72,6 @@
         </section>
     </main>
 </div>
-</body>
+<script src="{{ asset('js/app.js') }}?v=202609280945"></script></body>
 </html>
 
