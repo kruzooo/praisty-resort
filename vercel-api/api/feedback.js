@@ -1,7 +1,7 @@
 const { ensureSchema, getPool, isAdminRequest, json, readBody } = require('./_db');
 
 module.exports = async function handler(req, res) {
-  if (req.method !== 'GET' && req.method !== 'POST') {
+  if (!['GET', 'POST', 'DELETE'].includes(req.method)) {
     return json(res, 405, { ok: false, message: 'Method not allowed.' });
   }
 
@@ -21,6 +21,30 @@ module.exports = async function handler(req, res) {
       );
 
       return json(res, 200, { ok: true, feedback: result.rows });
+    }
+
+    if (req.method === 'DELETE') {
+      if (!isAdminRequest(req)) {
+        return json(res, 401, { ok: false, message: 'Admin code is required.' });
+      }
+
+      const requestUrl = new URL(req.url || '/', 'https://praisty-resort.vercel.app');
+      const id = Number(requestUrl.searchParams.get('id'));
+
+      if (!id) {
+        return json(res, 422, { ok: false, message: 'A valid feedback id is required.' });
+      }
+
+      const result = await getPool().query(
+        'delete from customer_feedback where id = $1 returning id',
+        [id]
+      );
+
+      if (!result.rows[0]) {
+        return json(res, 404, { ok: false, message: 'Feedback was not found.' });
+      }
+
+      return json(res, 200, { ok: true, message: 'Feedback deleted successfully.' });
     }
 
     const body = await readBody(req);

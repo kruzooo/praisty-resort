@@ -19,6 +19,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/login', [AdminAuthController::class, 'store'])->name('login.store');
     Route::get('/dashboard', [AdminAuthController::class, 'dashboard'])->middleware('admin')->name('dashboard');
     Route::get('/feedback', [AdminAuthController::class, 'feedback'])->middleware('admin')->name('feedback');
+    Route::delete('/feedback/{feedback}', [AdminAuthController::class, 'deleteFeedback'])->middleware('admin')->name('feedback.delete');
     Route::get('/{page}', [AdminAuthController::class, 'operations'])->middleware('admin')->whereIn('page', [
         'reservations',
         'villas',

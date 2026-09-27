@@ -39,9 +39,10 @@
                 <h1 class="mt-3 font-headline text-4xl text-primary sm:text-5xl">Guest Feedback Inbox</h1>
                 <p class="mt-2 max-w-2xl text-sm leading-6 text-on-surface-variant">Customer dashboard feedback and contact page inquiries appear here for admin review.</p>
             </div>
-            <div class="rounded bg-white px-5 py-4 shadow-sm"><p class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Total Feedback</p><p class="font-headline text-3xl text-primary">{{ $feedbackEntries->count() }}</p></div>
+            <div class="rounded bg-white px-5 py-4 shadow-sm"><p class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Total Feedback</p><p class="font-headline text-3xl text-primary" data-feedback-count>{{ $feedbackEntries->count() }}</p></div>
         </section>
-        <section class="grid gap-4">
+        @if (session('admin_status'))<div class="rounded border border-secondary/30 bg-green-50 px-4 py-3 text-sm font-semibold text-secondary" role="status">{{ session('admin_status') }}</div>@endif
+        <section class="grid gap-4" data-feedback-list>
             @forelse ($feedbackEntries as $entry)
                 <article class="rounded-lg bg-white p-6 shadow-sm">
                     <div class="flex flex-col justify-between gap-4 md:flex-row md:items-start">
@@ -57,7 +58,7 @@
                             </div>
                             <p class="mt-1 text-xs text-on-surface-variant">{{ $entry['email'] }} · Reference: {{ $entry['reference'] }}</p>
                         </div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">{{ \Carbon\Carbon::parse($entry['created_at'])->format('M d, Y · h:i A') }}</p>
+                        <div class="flex items-center gap-3"><p class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">{{ \Carbon\Carbon::parse($entry['created_at'])->format('M d, Y · h:i A') }}</p>@if ($entry['id'])<form action="{{ route('admin.feedback.delete', $entry['id']) }}" method="POST" onsubmit="return confirm('Delete this guest feedback?')">@csrf @method('DELETE')<button class="inline-flex items-center gap-1 rounded border border-red-200 px-2.5 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50" type="submit"><span class="material-symbols-outlined text-sm">delete</span>Delete</button></form>@endif</div>
                     </div>
                     <p class="mt-5 rounded-lg bg-surface-container-low p-4 text-sm leading-6 text-on-surface-variant">{{ $entry['message'] }}</p>
                 </article>

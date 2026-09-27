@@ -100,6 +100,13 @@ class AdminAuthController extends Controller
         ]);
     }
 
+    public function deleteFeedback(CustomerFeedback $feedback)
+    {
+        $feedback->delete();
+
+        return redirect()->route('admin.feedback')->with('admin_status', 'Guest feedback deleted successfully.');
+    }
+
     public function destroy(Request $request)
     {
         Auth::logout();
@@ -291,6 +298,7 @@ class AdminAuthController extends Controller
             ->latest()
             ->get()
             ->map(fn (CustomerFeedback $feedback) => [
+                'id' => $feedback->id,
                 'type' => 'Guest Feedback',
                 'name' => $feedback->name,
                 'email' => $feedback->email,
@@ -304,6 +312,7 @@ class AdminAuthController extends Controller
             ->latest()
             ->get()
             ->map(fn (ContactMessage $message) => [
+                'id' => null,
                 'type' => 'Contact Inquiry',
                 'name' => $message->name,
                 'email' => $message->email,
