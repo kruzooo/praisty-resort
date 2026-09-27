@@ -18,6 +18,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login', [AdminAuthController::class, 'create'])->name('login');
     Route::post('/login', [AdminAuthController::class, 'store'])->name('login.store');
     Route::get('/dashboard', [AdminAuthController::class, 'dashboard'])->middleware('admin')->name('dashboard');
+    Route::get('/reservations/feed', [AdminAuthController::class, 'reservationFeed'])->middleware('admin')->name('reservations.feed');
+    Route::patch('/reservations/{reservation}/status', [AdminAuthController::class, 'updateReservationStatus'])->middleware('admin')->name('reservations.status');
     Route::get('/feedback', [AdminAuthController::class, 'feedback'])->middleware('admin')->name('feedback');
     Route::delete('/feedback/{feedback}', [AdminAuthController::class, 'deleteFeedback'])->middleware('admin')->name('feedback.delete');
     Route::get('/{page}', [AdminAuthController::class, 'operations'])->middleware('admin')->whereIn('page', [

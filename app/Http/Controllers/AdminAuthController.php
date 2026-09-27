@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CustomerFeedback;
 use App\Models\ContactMessage;
+use App\Models\Reservation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -76,6 +77,39 @@ class AdminAuthController extends Controller
     public function dashboard()
     {
         return view('admin-dashboard');
+    }
+
+    public function reservationFeed()
+    {
+        return response()->json([
+            'reservations' => Reservation::query()
+                ->latest()
+                ->limit(50)
+                ->get()
+                ->map(fn (Reservation $reservation) => [
+                    'id' => $reservation->id,
+                    'guest_name' => $reservation->guest_name,
+                    'guest_email' => $reservation->guest_email,
+                    'room_slug' => $reservation->room_slug,
+                    'room_name' => $reservation->room_name,
+                    'check_in' => $reservation->check_in?->toDateString(),
+                    'check_out' => $reservation->check_out?->toDateString(),
+                    'guests' => $reservation->guests,
+                    'status' => $reservation->status,
+                    'created_at' => $reservation->created_at?->toIso8601String(),
+                ]),
+        ]);
+    }
+
+    public function updateReservationStatus(Request $request, Reservation $reservation)
+    {
+        $data = $request->validate([
+            'status' => ['required', 'in:processing,booked,cancelled'],
+        ]);
+
+        $reservation->update(['status' => $data['status']]);
+
+        return response()->json(['ok' => true, 'status' => $reservation->status]);
     }
 
     public function operations(string $page)
