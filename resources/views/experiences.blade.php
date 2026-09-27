@@ -16,7 +16,7 @@
     <style>
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
         .soft-shadow { box-shadow: 0 20px 40px -10px rgba(0, 30, 64, .05); }
-        .experience-card { transition: transform .4s cubic-bezier(.16, 1, .3, 1), box-shadow .4s cubic-bezier(.16, 1, .3, 1); }
+        .experience-card { transition: opacity .7s ease-out, transform .7s cubic-bezier(.16, 1, .3, 1), box-shadow .4s cubic-bezier(.16, 1, .3, 1); will-change: opacity, transform; }
         .experience-card:hover { box-shadow: 0 30px 60px -15px rgba(0, 30, 64, .12); transform: translateY(-8px); }
         .experience-card img { transition: transform .8s cubic-bezier(.16, 1, .3, 1); }
         .experience-card:hover img { transform: scale(1.05); }
