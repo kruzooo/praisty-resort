@@ -280,6 +280,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     const payload = formPayload(form);
                     payload.guest = profile;
                     payload.room_slug = action.split('/rooms/')[1]?.split('/')[0] || window.location.pathname.split('/rooms/')[1] || '';
+                    window.localStorage.setItem('praisty_pending_reservation', JSON.stringify(payload));
+                    window.location.replace('/reservation-cart');
+                } catch (error) {
+                    showStatus(form, error.message);
+                }
+                return;
+            }
+
+            if (action.includes('/guest-payment')) {
+                const profile = readProfile();
+                let pending = null;
+
+                try {
+                    pending = JSON.parse(window.localStorage.getItem('praisty_pending_reservation') || 'null');
+                } catch {
+                    pending = null;
+                }
+
+                if (!profile || !pending?.room_slug) {
+                    window.location.replace('/rooms');
+                    return;
+                }
+
+                try {
+                    const payload = { ...pending, ...formPayload(form), guest: profile };
                     const data = await apiPost('/api/reservations', payload);
                     window.localStorage.setItem('praisty_latest_reservation', JSON.stringify({
                         ...payload,
@@ -287,7 +312,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         guest_name: profile.name,
                         guest_email: profile.email,
                     }));
-                    window.location.replace('/customer-dashboard');
+                    window.localStorage.removeItem('praisty_pending_reservation');
+                    window.location.replace('/booking-confirmation');
                 } catch (error) {
                     showStatus(form, error.message);
                 }
