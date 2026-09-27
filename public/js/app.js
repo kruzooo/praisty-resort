@@ -175,6 +175,17 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    if (window.location.pathname === '/guest-login' && new URLSearchParams(window.location.search).has('created')) {
+        const form = document.querySelector('form');
+
+        if (form) {
+            const message = document.createElement('p');
+            message.className = 'mb-4 rounded bg-green-50 px-4 py-3 text-sm font-semibold text-secondary';
+            message.textContent = 'Account created successfully. Please sign in to continue.';
+            form.before(message);
+        }
+    }
+
     const showStatus = (form, message) => {
         let status = form.querySelector('[data-static-form-status]');
 

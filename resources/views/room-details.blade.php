@@ -88,7 +88,7 @@
 
 <div aria-hidden="true" class="fixed inset-0 z-[60] hidden items-center justify-center bg-primary/90 p-5 backdrop-blur-sm" id="lightbox" role="dialog"><button aria-label="Close image preview" class="absolute right-5 top-5 text-4xl text-on-primary" id="lightbox-close" type="button">&times;</button><img class="max-h-[85vh] max-w-full rounded-lg object-contain" id="lightbox-image" src="" alt=""></div>
 <footer class="bg-primary py-12 text-on-primary"><div class="mx-auto flex max-w-container-max flex-col justify-between gap-5 px-margin-mobile md:flex-row md:items-end md:px-margin-desktop"><div><div class="mb-3 font-headline text-2xl tracking-widest">PRAISTY</div><p class="max-w-xs text-sm text-primary-fixed">A modern sanctuary where raw nature meets refined luxury.</p></div><p class="text-sm text-primary-fixed">&copy; {{ date('Y') }} Praisty Resort &amp; Spa. All rights reserved.</p></div></footer>
-<script src="{{ asset('js/app.js') }}"></script>
+<script src="{{ asset('js/app.js') }}?v=202609271410"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const checkIn = document.getElementById('check_in'), checkOut = document.getElementById('check_out'), rate = Number(document.getElementById('room-rate').dataset.rate);

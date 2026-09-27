@@ -36,7 +36,7 @@
     </div>
 </main>
 <footer class="bg-primary py-12 text-on-primary"><div class="mx-auto flex max-w-container-max flex-col justify-between gap-5 px-margin-mobile md:flex-row md:items-end md:px-margin-desktop"><div><div class="mb-3 font-headline text-2xl tracking-widest">PRAISTY</div><p class="max-w-xs text-sm text-primary-fixed">A modern sanctuary where raw nature meets refined luxury.</p></div><p class="text-sm text-primary-fixed">&copy; {{ date('Y') }} Praisty Resort &amp; Spa. All rights reserved.</p></div></footer>
-<script src="{{ asset('js/app.js') }}"></script>
+<script src="{{ asset('js/app.js') }}?v=202609271410"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const total = document.getElementById('total-value'), summary = document.getElementById('add-on-summary'), format = value => `PHP ${new Intl.NumberFormat('en-PH').format(value)}`; let selected = [];
