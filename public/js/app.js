@@ -281,11 +281,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     payload.guest = profile;
                     payload.room_slug = action.split('/rooms/')[1]?.split('/')[0] || window.location.pathname.split('/rooms/')[1] || '';
                     const data = await apiPost('/api/reservations', payload);
-                    window.localStorage.setItem('praisty_latest_reservation', JSON.stringify(data.reservation));
-                    showStatus(form, 'Reservation request received. You can view it in your customer dashboard.');
-                    window.setTimeout(() => {
-                        window.location.href = '/customer-dashboard';
-                    }, 900);
+                    window.localStorage.setItem('praisty_latest_reservation', JSON.stringify({
+                        ...payload,
+                        ...data.reservation,
+                        guest_name: profile.name,
+                        guest_email: profile.email,
+                    }));
+                    window.location.replace('/customer-dashboard');
                 } catch (error) {
                     showStatus(form, error.message);
                 }
