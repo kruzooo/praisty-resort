@@ -454,7 +454,7 @@
         });
     </script>
 
-<script src="{{ asset('js/app.js') }}?v=202609271410"></script>
+<script src="{{ asset('js/app.js') }}?v=202609271430"></script>
 
 
 </body></html>

@@ -175,6 +175,51 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    const profileStorageKey = 'praisty_guest_profile';
+    const readProfile = () => {
+        try {
+            return JSON.parse(window.localStorage.getItem(profileStorageKey) || 'null');
+        } catch {
+            return null;
+        }
+    };
+    const writeProfile = (profile) => {
+        window.localStorage.setItem(profileStorageKey, JSON.stringify(profile));
+    };
+    const nameFromEmail = (email) => {
+        const base = String(email || 'Guest').split('@')[0].replace(/[._-]+/g, ' ').trim();
+
+        return base ? base.replace(/\b\w/g, (letter) => letter.toUpperCase()) : 'Praisty Guest';
+    };
+    const applyStaticProfile = () => {
+        const profile = readProfile();
+        const button = document.getElementById('profile-menu-button');
+        const menu = document.getElementById('profile-menu');
+
+        if (!profile || !button || !menu) {
+            return;
+        }
+
+        button.textContent = (profile.name || 'G').trim().charAt(0).toUpperCase();
+        menu.innerHTML = `
+            <div class="border-b border-surface-container-highest px-5 py-4">
+                <p class="text-sm font-semibold text-primary">${profile.name}</p>
+                <p class="mt-1 truncate text-xs text-on-surface-variant">${profile.email}</p>
+            </div>
+            <div class="p-2">
+                <a class="flex items-center gap-3 rounded px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-surface-container-low" href="/customer-dashboard" role="menuitem"><span class="material-symbols-outlined text-lg">dashboard</span>Customer Dashboard</a>
+                <a class="flex items-center gap-3 rounded px-3 py-2.5 text-sm text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary" href="/rooms" role="menuitem"><span class="material-symbols-outlined text-lg">villa</span>Explore Rooms & Villas</a>
+                <button class="flex w-full items-center gap-3 rounded px-3 py-2.5 text-left text-sm text-error transition-colors hover:bg-red-50" data-static-logout type="button"><span class="material-symbols-outlined text-lg">logout</span>Sign out</button>
+            </div>
+        `;
+        menu.querySelector('[data-static-logout]')?.addEventListener('click', () => {
+            window.localStorage.removeItem(profileStorageKey);
+            window.location.href = '/';
+        });
+    };
+
+    applyStaticProfile();
+
     if (window.location.pathname === '/guest-login' && new URLSearchParams(window.location.search).has('created')) {
         const form = document.querySelector('form');
 
@@ -211,11 +256,26 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (action.includes('/create-account')) {
+                const formData = new FormData(form);
+                const name = String(formData.get('name') || '').trim() || nameFromEmail(formData.get('email'));
+                const email = String(formData.get('email') || '').trim();
+
+                if (email) {
+                    writeProfile({ name, email });
+                }
+
                 window.location.href = '/guest-login?created=1';
                 return;
             }
 
             if (action.includes('/guest-login')) {
+                const formData = new FormData(form);
+                const email = String(formData.get('email') || '').trim();
+
+                writeProfile({
+                    name: nameFromEmail(email),
+                    email: email || 'guest@praisty.local',
+                });
                 window.location.href = '/';
                 return;
             }

@@ -24,7 +24,7 @@
     </div>
 </main>
 <footer class="bg-primary py-12 text-on-primary"><div class="mx-auto flex max-w-container-max flex-col justify-between gap-5 px-margin-mobile md:flex-row md:items-end md:px-margin-desktop"><div><div class="mb-3 font-headline text-2xl tracking-widest">PRAISTY</div><p class="max-w-xs text-sm text-primary-fixed">A modern sanctuary where raw nature meets refined luxury.</p></div><p class="text-sm text-primary-fixed">&copy; {{ date('Y') }} Praisty Resort &amp; Spa. All rights reserved.</p></div></footer>
-<script src="{{ asset('js/app.js') }}?v=202609271410"></script>
+<script src="{{ asset('js/app.js') }}?v=202609271430"></script>
 <script>document.getElementById('copy-reference').addEventListener('click', async () => { const reference = document.getElementById('booking-reference').textContent.trim(); try { await navigator.clipboard.writeText(reference); document.getElementById('copy-icon').textContent = 'check'; document.getElementById('copy-feedback').classList.remove('opacity-0'); setTimeout(() => { document.getElementById('copy-icon').textContent = 'content_copy'; document.getElementById('copy-feedback').classList.add('opacity-0'); }, 1800); } catch { } }); let dashboardSeconds = 5; const countdown = document.getElementById('dashboard-countdown'); const dashboardUrl = @json(route('customer.dashboard')); const dashboardTimer = setInterval(() => { dashboardSeconds -= 1; if (countdown) countdown.textContent = dashboardSeconds; if (dashboardSeconds <= 0) { clearInterval(dashboardTimer); window.location.href = dashboardUrl; } }, 1000);</script>
 </body>
 </html>
