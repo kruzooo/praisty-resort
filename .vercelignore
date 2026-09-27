@@ -3,6 +3,9 @@
 .env.production
 database/database.sqlite
 node_modules
+package.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
 storage/app/*.json
 storage/logs/*.log
 vendor
