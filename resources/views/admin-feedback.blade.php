@@ -72,6 +72,7 @@
         </section>
     </main>
 </div>
+<script src="{{ asset('js/admin-feedback.js') }}?v=202609281430"></script>
 <script src="{{ asset('js/app.js') }}?v=202609280945"></script></body>
 </html>
 

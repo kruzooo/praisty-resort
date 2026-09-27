@@ -53,13 +53,13 @@
         <section class="grid gap-4 md:grid-cols-3">
             @foreach ($page['stats'] as $stat)
                 <article class="rounded-lg bg-white p-5 shadow-sm">
-                    <p class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">{{ $stat['label'] }}</p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">{{ $stat['label'] }}</p>
                     <p class="mt-3 font-headline text-3xl text-primary">{{ $stat['value'] }}</p>
                     <span class="mt-4 inline-flex rounded-full px-3 py-1 text-xs font-semibold {{ $stat['tone'] }}">Live admin metric</span>
                 </article>
             @endforeach
         </section>
-        <section class="rounded-lg bg-white p-6 shadow-sm">
+        <section class="rounded-lg bg-white p-6 shadow-sm" @if ($page['eyebrow'] === 'Reservations & Stays') id="admin-reservation-list" data-admin-reservations @endif>
             <div class="overflow-x-auto">
                 <table class="min-w-[760px] w-full text-left text-sm">
                     <thead class="bg-surface-container-low text-xs uppercase tracking-wider text-on-surface-variant">
@@ -81,6 +81,9 @@
         </section>
     </main>
 </div>
+@if ($page['eyebrow'] === 'Reservations & Stays')
+<script src="{{ asset('js/admin-reservation-list.js') }}?v=202609281430"></script>
+@endif
 <script src="{{ asset('js/app.js') }}?v=202609280945"></script></body>
 </html>
 

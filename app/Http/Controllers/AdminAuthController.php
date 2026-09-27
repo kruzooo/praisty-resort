@@ -118,6 +118,25 @@ class AdminAuthController extends Controller
 
         abort_unless(isset($pages[$page]), 404);
 
+        if ($page === 'reservations') {
+            $reservations = Reservation::query()->latest()->limit(50)->get();
+            $pages[$page]['stats'] = [
+                ['label' => 'Processing', 'value' => $reservations->where('status', 'processing')->count(), 'tone' => 'bg-amber-50 text-amber-800'],
+                ['label' => 'Successfully Booked', 'value' => $reservations->where('status', 'booked')->count(), 'tone' => 'bg-green-50 text-secondary'],
+                ['label' => 'Cancelled', 'value' => $reservations->where('status', 'cancelled')->count(), 'tone' => 'bg-red-50 text-error'],
+            ];
+            $pages[$page]['rows'] = $reservations->map(fn (Reservation $reservation) => [
+                'title' => $reservation->guest_name,
+                'meta' => ($reservation->room_name ?? str($reservation->room_slug)->replace('-', ' ')->title()).' · '.($reservation->check_in?->format('M d, Y') ?? 'Dates pending').' - '.($reservation->check_out?->format('M d, Y') ?? 'Dates pending'),
+                'status' => match ($reservation->status) {
+                    'booked' => 'Successfully Booked',
+                    'cancelled' => 'Cancelled',
+                    default => 'Processing',
+                },
+                'note' => $reservation->guest_email.' · Live database',
+            ])->all();
+        }
+
         return view('admin-page', [
             'admin' => Auth::user() ?? (object) session('admin_profile'),
             'page' => $pages[$page],
