@@ -1,0 +1,8 @@
+.env
+.env.backup
+.env.production
+database/database.sqlite
+node_modules
+storage/app/*.json
+storage/logs/*.log
+vendor
