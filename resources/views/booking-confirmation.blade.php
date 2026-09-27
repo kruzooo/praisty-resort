@@ -28,3 +28,4 @@
 <script>document.getElementById('copy-reference').addEventListener('click', async () => { const reference = document.getElementById('booking-reference').textContent.trim(); try { await navigator.clipboard.writeText(reference); document.getElementById('copy-icon').textContent = 'check'; document.getElementById('copy-feedback').classList.remove('opacity-0'); setTimeout(() => { document.getElementById('copy-icon').textContent = 'content_copy'; document.getElementById('copy-feedback').classList.add('opacity-0'); }, 1800); } catch { } }); let dashboardSeconds = 5; const countdown = document.getElementById('dashboard-countdown'); const dashboardUrl = @json(route('customer.dashboard')); const dashboardTimer = setInterval(() => { dashboardSeconds -= 1; if (countdown) countdown.textContent = dashboardSeconds; if (dashboardSeconds <= 0) { clearInterval(dashboardTimer); window.location.href = dashboardUrl; } }, 1000);</script>
 </body>
 </html>
+

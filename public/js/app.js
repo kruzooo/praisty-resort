@@ -319,7 +319,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (action.includes('/admin/login')) {
-                showStatus(form, 'Admin login is available on the local or shared-hosting Laravel backend.');
+                try {
+                    const data = await apiPost('/api/admin/login', formPayload(form));
+                    window.localStorage.setItem('praisty_admin_profile', JSON.stringify(data.admin));
+                    showStatus(form, 'Admin verified. Opening dashboard...');
+                    window.setTimeout(() => {
+                        window.location.href = '/admin/dashboard';
+                    }, 700);
+                } catch (error) {
+                    showStatus(form, error.message);
+                }
                 return;
             }
 

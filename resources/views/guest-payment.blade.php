@@ -35,3 +35,4 @@
 <script src="{{ asset('js/app.js') }}?v=202609271500"></script>
 </body>
 </html>
+

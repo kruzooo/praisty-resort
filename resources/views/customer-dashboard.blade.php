@@ -19,3 +19,4 @@
 </main><footer class="bg-primary-container py-8 text-center text-xs text-white/70">Praisty Resort &amp; Spa · El Nido, Palawan · <a class="underline underline-offset-4" href="{{ route('contact') }}">Contact</a></footer>
 </body>
 </html>
+

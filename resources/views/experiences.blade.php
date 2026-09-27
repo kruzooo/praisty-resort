@@ -37,3 +37,4 @@
 <script src="{{ asset('js/app.js') }}?v=202609271500"></script><script>const menuButton=document.getElementById('mobile-menu-button');const mobileMenu=document.getElementById('mobile-menu');menuButton?.addEventListener('click',()=>{const hidden=mobileMenu.classList.toggle('hidden');menuButton.setAttribute('aria-expanded',String(!hidden));});</script>
 </body>
 </html>
+
