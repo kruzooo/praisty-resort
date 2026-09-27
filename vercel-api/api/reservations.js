@@ -9,8 +9,23 @@ module.exports = async function handler(req, res) {
     await ensureSchema();
 
     if (req.method === 'GET') {
-      if (!isAdminRequest(req)) {
-        return json(res, 401, { ok: false, message: 'Admin code is required.' });
+      const guestEmail = String(req.query?.email || '').trim().toLowerCase();
+
+      if (!isAdminRequest(req) && !guestEmail) {
+        return json(res, 401, { ok: false, message: 'Guest email or admin code is required.' });
+      }
+
+      if (guestEmail) {
+        const result = await getPool().query(
+          `select id, guest_name, guest_email, room_slug, check_in, check_out, guests, status, created_at
+           from reservations
+           where lower(guest_email) = $1
+           order by created_at desc
+           limit 1`,
+          [guestEmail]
+        );
+
+        return json(res, 200, { ok: true, reservation: result.rows[0] || null });
       }
 
       const result = await getPool().query(
