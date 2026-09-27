@@ -167,3 +167,59 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('load', updateCarousel);
     updateCarousel();
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const isStaticVercel = window.location.hostname.endsWith('.vercel.app');
+
+    if (!isStaticVercel) {
+        return;
+    }
+
+    const showStatus = (form, message) => {
+        let status = form.querySelector('[data-static-form-status]');
+
+        if (!status) {
+            status = document.createElement('p');
+            status.dataset.staticFormStatus = 'true';
+            status.className = 'mt-4 text-sm font-semibold text-primary';
+            form.append(status);
+        }
+
+        status.textContent = message;
+    };
+
+    document.querySelectorAll('form[method="POST"], form[method="post"]').forEach((form) => {
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const action = form.getAttribute('action') || window.location.pathname;
+
+            if (action.includes('/rooms/') || action.includes('/reservation')) {
+                window.location.href = '/guest-login';
+                return;
+            }
+
+            if (action.includes('/create-account')) {
+                window.location.href = '/guest-login?created=1';
+                return;
+            }
+
+            if (action.includes('/guest-login')) {
+                window.location.href = '/';
+                return;
+            }
+
+            if (action.includes('/admin/login')) {
+                showStatus(form, 'Admin login is available on the local or shared-hosting Laravel backend.');
+                return;
+            }
+
+            if (action.includes('/forgot-password')) {
+                showStatus(form, 'Password reset requests are available on the full Laravel backend.');
+                return;
+            }
+
+            showStatus(form, 'Thank you. Your message has been received for review.');
+        });
+    });
+});
