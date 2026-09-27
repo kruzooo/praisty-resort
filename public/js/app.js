@@ -89,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const targets = Array.from(document.querySelectorAll([
-        'main',
         'main > section',
         'main > article',
         'body > section:not(:first-of-type)',
@@ -98,7 +97,13 @@ document.addEventListener('DOMContentLoaded', () => {
         '#faq-container > *',
     ].join(',')));
 
-    const uniqueTargets = [...new Set(targets)].filter((element) => !element.closest('[data-hero-video]'));
+    let uniqueTargets = [...new Set(targets)].filter((element) => !element.closest('[data-hero-video]'));
+
+    // Simple pages without component-level sections still receive the reveal, without
+    // animating a parent and its cards at the same time.
+    if (uniqueTargets.length === 0) {
+        uniqueTargets = Array.from(document.querySelectorAll('main')).filter((element) => !element.closest('[data-hero-video]'));
+    }
 
     if (!('IntersectionObserver' in window)) {
         uniqueTargets.forEach((element) => element.classList.add('is-visible'));
