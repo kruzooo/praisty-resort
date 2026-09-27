@@ -486,7 +486,7 @@
 </div>
 </footer>
 
-<script src="{{ asset('js/app.js') }}?v=202609271430"></script>
+<script src="{{ asset('js/app.js') }}?v=202609271500"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const menuButton = document.getElementById('mobile-menu-button');

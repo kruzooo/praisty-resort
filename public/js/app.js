@@ -186,6 +186,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const writeProfile = (profile) => {
         window.localStorage.setItem(profileStorageKey, JSON.stringify(profile));
     };
+    const apiPost = async (path, payload) => {
+        const response = await fetch(path, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok || data.ok === false) {
+            throw new Error(data.message || 'The request could not be completed.');
+        }
+
+        return data;
+    };
+    const formPayload = (form) => Object.fromEntries(new FormData(form).entries());
     const nameFromEmail = (email) => {
         const base = String(email || 'Guest').split('@')[0].replace(/[._-]+/g, ' ').trim();
 
@@ -245,38 +263,58 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     document.querySelectorAll('form[method="POST"], form[method="post"]').forEach((form) => {
-        form.addEventListener('submit', (event) => {
+        form.addEventListener('submit', async (event) => {
             event.preventDefault();
 
             const action = form.getAttribute('action') || window.location.pathname;
 
             if (action.includes('/rooms/') || action.includes('/reservation')) {
-                window.location.href = '/guest-login';
+                const profile = readProfile();
+
+                if (!profile) {
+                    window.location.href = '/guest-login';
+                    return;
+                }
+
+                try {
+                    const payload = formPayload(form);
+                    payload.guest = profile;
+                    payload.room_slug = action.split('/rooms/')[1]?.split('/')[0] || window.location.pathname.split('/rooms/')[1] || '';
+                    const data = await apiPost('/api/reservations', payload);
+                    window.localStorage.setItem('praisty_latest_reservation', JSON.stringify(data.reservation));
+                    showStatus(form, 'Reservation request received. You can view it in your customer dashboard.');
+                    window.setTimeout(() => {
+                        window.location.href = '/customer-dashboard';
+                    }, 900);
+                } catch (error) {
+                    showStatus(form, error.message);
+                }
                 return;
             }
 
             if (action.includes('/create-account')) {
-                const formData = new FormData(form);
-                const name = String(formData.get('name') || '').trim() || nameFromEmail(formData.get('email'));
-                const email = String(formData.get('email') || '').trim();
-
-                if (email) {
-                    writeProfile({ name, email });
+                try {
+                    const data = await apiPost('/api/auth/register', formPayload(form));
+                    writeProfile(data.guest);
+                    window.location.href = '/guest-login?created=1';
+                } catch (error) {
+                    showStatus(form, error.message);
                 }
-
-                window.location.href = '/guest-login?created=1';
                 return;
             }
 
             if (action.includes('/guest-login')) {
-                const formData = new FormData(form);
-                const email = String(formData.get('email') || '').trim();
-
-                writeProfile({
-                    name: nameFromEmail(email),
-                    email: email || 'guest@praisty.local',
-                });
-                window.location.href = '/';
+                try {
+                    const payload = formPayload(form);
+                    const data = await apiPost('/api/auth/login', payload);
+                    writeProfile(data.guest || {
+                        name: nameFromEmail(payload.email),
+                        email: payload.email || 'guest@praisty.local',
+                    });
+                    window.location.href = '/';
+                } catch (error) {
+                    showStatus(form, error.message);
+                }
                 return;
             }
 
@@ -290,7 +328,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            showStatus(form, 'Thank you. Your message has been received for review.');
+            if (action.includes('/contact')) {
+                try {
+                    const data = await apiPost('/api/contact', formPayload(form));
+                    form.reset();
+                    showStatus(form, data.message || 'Thank you. Your inquiry was sent to the Praisty team.');
+                } catch (error) {
+                    showStatus(form, error.message);
+                }
+                return;
+            }
+
+            if (action.includes('/customer-feedback')) {
+                const profile = readProfile();
+                try {
+                    const payload = formPayload(form);
+                    payload.guest = profile || {};
+                    const data = await apiPost('/api/feedback', payload);
+                    form.reset();
+                    showStatus(form, data.message || 'Thank you. Your feedback was sent.');
+                } catch (error) {
+                    showStatus(form, error.message);
+                }
+                return;
+            }
+
+            showStatus(form, 'This action is connected to the backend where available.');
         });
     });
 });
