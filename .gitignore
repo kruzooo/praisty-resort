@@ -25,3 +25,12 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+.vercel
+.env*
+vercel-static-*/
+.tmp-vercel-php-*/
+vercel-php-patched/
+vercel-php-*.tgz
+pnpm-lock.yaml
+pnpm-workspace.yaml
