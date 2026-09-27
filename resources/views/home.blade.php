@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet">
 <!-- Material Symbols -->
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<link href="{{ asset('css/app.css') }}" rel="stylesheet">
+<link href="{{ asset('css/app.css') }}?v=202609280945" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script id="tailwind-config">
@@ -454,7 +454,7 @@
         });
     </script>
 
-<script src="{{ asset('js/app.js') }}?v=202609271500"></script>
+<script src="{{ asset('js/app.js') }}?v=202609280945"></script>
 
 
 </body></html>

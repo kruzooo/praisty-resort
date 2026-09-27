@@ -82,6 +82,46 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Reveal meaningful page content as it enters the viewport without affecting navigation or forms.
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+    }
+
+    const targets = Array.from(document.querySelectorAll([
+        'main > section',
+        'main > article',
+        'body > section:not(:first-of-type)',
+        '.experience-card',
+        '.life-carousel',
+        '#faq-container > *',
+    ].join(',')));
+
+    const uniqueTargets = [...new Set(targets)].filter((element) => !element.closest('[data-hero-video]'));
+
+    if (!('IntersectionObserver' in window)) {
+        uniqueTargets.forEach((element) => element.classList.add('is-visible'));
+        return;
+    }
+
+    const observer = new IntersectionObserver((entries, activeObserver) => {
+        entries.forEach((entry) => {
+            if (!entry.isIntersecting) {
+                return;
+            }
+
+            entry.target.classList.add('is-visible');
+            activeObserver.unobserve(entry.target);
+        });
+    }, { threshold: 0.12, rootMargin: '0px 0px -48px' });
+
+    uniqueTargets.forEach((element, index) => {
+        element.classList.add('scroll-reveal');
+        element.style.transitionDelay = `${Math.min(index % 4, 3) * 80}ms`;
+        observer.observe(element);
+    });
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     const carousel = document.querySelector('[data-life-carousel]');
 

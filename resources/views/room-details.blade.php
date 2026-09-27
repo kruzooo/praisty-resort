@@ -9,7 +9,7 @@
     <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..900&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,400..900&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/app.css') }}?v=202609280945" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>tailwind.config={theme:{extend:{colors:{background:'#fbf9f4',surface:'#fbf9f4','surface-container-low':'#f5f3ee','surface-container-high':'#eae8e3','surface-container-highest':'#e4e2dd',primary:'#001e40','primary-container':'#003366','on-primary':'#ffffff','primary-fixed':'#d5e3ff','inverse-primary':'#a7c8ff',secondary:'#3b6934','secondary-container':'#b9eeab','on-secondary-container':'#3f6d38','on-surface':'#1b1c19','on-surface-variant':'#43474f',outline:'#737780','outline-variant':'#c3c6d1'},spacing:{'section-gap':'120px','margin-mobile':'20px','container-max':'1280px','margin-desktop':'64px'},fontFamily:{display:['EB Garamond','serif'],headline:['EB Garamond','serif'],body:['Hanken Grotesk','sans-serif']}}}};</script>
 </head>
@@ -88,7 +88,7 @@
 
 <div aria-hidden="true" class="fixed inset-0 z-[60] hidden items-center justify-center bg-primary/90 p-5 backdrop-blur-sm" id="lightbox" role="dialog"><button aria-label="Close image preview" class="absolute right-5 top-5 text-4xl text-on-primary" id="lightbox-close" type="button">&times;</button><img class="max-h-[85vh] max-w-full rounded-lg object-contain" id="lightbox-image" src="" alt=""></div>
 <footer class="bg-primary py-12 text-on-primary"><div class="mx-auto flex max-w-container-max flex-col justify-between gap-5 px-margin-mobile md:flex-row md:items-end md:px-margin-desktop"><div><div class="mb-3 font-headline text-2xl tracking-widest">PRAISTY</div><p class="max-w-xs text-sm text-primary-fixed">A modern sanctuary where raw nature meets refined luxury.</p></div><p class="text-sm text-primary-fixed">&copy; {{ date('Y') }} Praisty Resort &amp; Spa. All rights reserved.</p></div></footer>
-<script src="{{ asset('js/app.js') }}?v=202609271500"></script>
+<script src="{{ asset('js/app.js') }}?v=202609280945"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const checkIn = document.getElementById('check_in'), checkOut = document.getElementById('check_out'), rate = Number(document.getElementById('room-rate').dataset.rate);

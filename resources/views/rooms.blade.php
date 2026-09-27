@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&amp;family=Hanken+Grotesk:wght@400;500;600&amp;display=swap" rel="stylesheet">
 <!-- Material Symbols -->
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<link href="{{ asset('css/app.css') }}" rel="stylesheet">
+<link href="{{ asset('css/app.css') }}?v=202609280945" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
 <style>
         .material-symbols-outlined {
@@ -486,7 +486,7 @@
 </div>
 </footer>
 
-<script src="{{ asset('js/app.js') }}?v=202609271500"></script>
+<script src="{{ asset('js/app.js') }}?v=202609280945"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const menuButton = document.getElementById('mobile-menu-button');

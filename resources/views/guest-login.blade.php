@@ -30,6 +30,6 @@
         </div></section>
     </div></div></main>
     <script>document.getElementById('password-toggle').addEventListener('click', function () { const password = document.getElementById('password'); const visible = password.type === 'text'; password.type = visible ? 'password' : 'text'; this.setAttribute('aria-label', visible ? 'Show password' : 'Hide password'); this.querySelector('span').textContent = visible ? 'visibility' : 'visibility_off'; });</script>
-<script src="{{ asset('js/app.js') }}?v=202609271500"></script></body>
+<script src="{{ asset('js/app.js') }}?v=202609280945"></script></body>
 </html>
 

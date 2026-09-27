@@ -51,6 +51,6 @@
         <p class="mt-6 text-center text-sm text-on-surface-variant">Remembered it? <a class="font-semibold text-primary underline underline-offset-4 hover:text-secondary" href="{{ route('guest.login') }}">Sign in</a></p>
     </section>
 </main>
-<script src="{{ asset('js/app.js') }}?v=202609271500"></script></body>
+<script src="{{ asset('js/app.js') }}?v=202609280945"></script></body>
 </html>
 
