@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'main > article',
         'body > section:not(:first-of-type)',
         '.experience-card',
+        '.room-card',
         '.life-carousel',
         '#faq-container > *',
     ].join(',')));

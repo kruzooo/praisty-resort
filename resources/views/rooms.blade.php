@@ -385,7 +385,7 @@
 <!-- Bento/Spacious Grid -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
 @foreach ($visibleRooms as $room)
-<article class="group flex flex-col bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_15px_40px_-15px_rgba(0,30,64,0.06)] hover:shadow-[0_25px_50px_-12px_rgba(0,30,64,0.12)] transition-all duration-500 border border-surface-container-high">
+<article class="room-card group flex flex-col bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_15px_40px_-15px_rgba(0,30,64,0.06)] hover:-translate-y-1 hover:shadow-[0_25px_50px_-12px_rgba(0,30,64,0.12)] transition-all duration-500 border border-surface-container-high">
 <div class="relative h-[350px] lg:h-[450px] overflow-hidden">
 <img alt="{{ $room['alt'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-in-out" loading="lazy" src="{{ asset($room['image']) }}">
 <div class="absolute top-4 left-4 bg-surface/90 backdrop-blur px-4 py-1.5 rounded-full border border-outline-variant/20">
@@ -486,7 +486,7 @@
 </div>
 </footer>
 
-<script src="{{ asset('js/app.js') }}?v=202609280945"></script>
+<script src="{{ asset('js/app.js') }}?v=202609281600"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const menuButton = document.getElementById('mobile-menu-button');
