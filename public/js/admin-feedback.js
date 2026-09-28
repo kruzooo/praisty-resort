@@ -34,12 +34,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 fetch(`/api/feedback?code=${code}`, { headers, cache: 'no-store' }),
                 fetch(`/api/contact?code=${code}`, { headers, cache: 'no-store' }),
             ]);
-            if (!feedbackResponse.ok || !reportsResponse.ok) throw new Error('Admin reports unavailable');
-            const [feedbackData, reportsData] = await Promise.all([feedbackResponse.json(), reportsResponse.json()]);
+            const feedbackData = feedbackResponse.ok ? await feedbackResponse.json() : { feedback: [] };
+            const reportsData = reportsResponse.ok ? await reportsResponse.json() : { messages: [] };
             render(feedbackData.feedback || [], reportsData.messages || []);
         } catch {
-            list.innerHTML = '<article class="rounded-lg bg-white p-10 text-center shadow-sm"><span class="material-symbols-outlined text-5xl text-error">error</span><h2 class="mt-3 font-headline text-3xl text-primary">Reports are unavailable</h2><p class="mt-2 text-sm text-on-surface-variant">Refresh the page to reconnect to the live database.</p></article>';
-            if (count) count.textContent = '0';
+            window.setTimeout(load, 1500);
         }
     };
     load();

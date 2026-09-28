@@ -160,7 +160,7 @@
             });
         });
     </script>
-<script src="{{ asset('js/admin-reservation-board.js') }}?v=202609281110"></script><script src="{{ asset('js/app.js') }}?v=202609280945"></script></body>
+<script src="{{ asset('js/admin-reservation-board.js') }}?v=202609281500"></script><script src="{{ asset('js/app.js') }}?v=202609280945"></script></body>
 </html>
 
 

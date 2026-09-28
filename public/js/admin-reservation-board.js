@@ -83,17 +83,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    const loadReservations = async () => {
+    const loadReservations = async (attempt = 0) => {
         try {
             const path = isStaticVercel ? `/api/reservations?code=${encodeURIComponent(adminCode)}` : '/admin/reservations/feed';
             const headers = { Accept: 'application/json' };
             if (isStaticVercel) headers['x-admin-code'] = adminCode;
-            const response = await fetch(path, { headers });
+            const response = await fetch(path, { headers, cache: 'no-store' });
             if (!response.ok) throw new Error('Reservation feed failed.');
             const data = await response.json();
+            if (data.ok === false) throw new Error(data.message || 'Reservation feed failed.');
             render(data.reservations || []);
         } catch {
-            tableBody.innerHTML = '<tr><td class="px-4 py-8 text-center text-sm text-error" colspan="5">Reservations are temporarily unavailable. Refresh to try again.</td></tr>';
+            if (attempt < 3) {
+                window.setTimeout(() => loadReservations(attempt + 1), 1500);
+                return;
+            }
+            tableBody.innerHTML = '<tr><td class="px-4 py-8 text-center text-sm text-error" colspan="5">Reservations are temporarily unavailable. Reconnecting automatically...</td></tr>';
         }
     };
 

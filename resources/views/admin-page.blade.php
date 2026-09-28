@@ -82,7 +82,7 @@
     </main>
 </div>
 @if ($page['eyebrow'] === 'Reservations & Stays')
-<script src="{{ asset('js/admin-reservation-list.js') }}?v=202609281430"></script>
+<script src="{{ asset('js/admin-reservation-list.js') }}?v=202609281500"></script>
 @endif
 <script src="{{ asset('js/app.js') }}?v=202609280945"></script></body>
 </html>
