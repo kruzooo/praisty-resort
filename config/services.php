@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'reservation_sync' => [
+        'url' => env('RESERVATION_SYNC_URL', 'https://praisty-resort.vercel.app/api/reservations'),
+    ],
+
 ];

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\CustomerFeedback;
 use App\Models\ContactMessage;
 use App\Models\Reservation;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -191,7 +193,7 @@ class HomeController extends Controller
             'reference' => 'PR-'.now()->format('Y').'-'.random_int(10000, 99999),
         ]);
 
-        Reservation::create([
+        $reservation = Reservation::create([
             'user_id' => $request->user()?->id,
             'reference' => $request->session()->get('guest_reservation.reference'),
             'guest_name' => $request->string('full_name')->toString(),
@@ -211,6 +213,27 @@ class HomeController extends Controller
             'payment_method' => $request->string('payment_method')->toString(),
             'status' => 'processing',
         ]);
+
+        try {
+            Http::timeout(8)->acceptJson()->post(config('services.reservation_sync.url'), [
+                'guest' => [
+                    'name' => $reservation->guest_name,
+                    'email' => $reservation->guest_email,
+                ],
+                'guest_name' => $reservation->guest_name,
+                'guest_email' => $reservation->guest_email,
+                'room_slug' => $reservation->room_slug,
+                'check_in' => $reservation->check_in->toDateString(),
+                'check_out' => $reservation->check_out->toDateString(),
+                'guests' => $reservation->guests,
+                'source_reference' => $reservation->reference,
+            ])->throw();
+        } catch (\Throwable $exception) {
+            Log::warning('Reservation saved locally but live sync failed.', [
+                'reference' => $reservation->reference,
+                'error' => $exception->getMessage(),
+            ]);
+        }
 
         return redirect()->route('reservation.confirmation');
     }
