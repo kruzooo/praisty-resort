@@ -285,6 +285,93 @@ document.addEventListener('DOMContentLoaded', () => {
 
     applyStaticProfile();
 
+    const roomCatalog = {
+        'royal-overwater-bungalow': { name: 'Royal Overwater Bungalow', type: 'Overwater Bungalow', image: '/images/resort/royal-overwater-bungalow.png', price: 95000, feature: 'Direct Lagoon Access', bed: '1 King Bed' },
+        'sunset-beachfront-villa': { name: 'Sunset Beachfront Villa', type: 'Beachfront Villa', image: '/images/resort/sunset-beachfront-villa.png', price: 88000, feature: 'Sunset Beach Access', bed: '2 King Beds' },
+        'canopy-jungle-villa': { name: 'Canopy Jungle Villa', type: 'Private Villa', image: '/images/resort/canopy-jungle-villa.png', price: 82000, feature: 'Private Plunge Pool', bed: '2 King Beds' },
+        'ocean-serenity-wellness-villa': { name: 'Ocean Serenity Wellness Villa', type: 'Wellness Villa', image: '/images/resort/ocean-serenity-wellness-villa.png', price: 72000, feature: 'Wellness Terrace', bed: '1 King Bed + Lounge' },
+        'azure-ocean-suite': { name: 'Azure Ocean Suite', type: 'Premium Suite', image: '/images/resort/azure-ocean-suite.png', price: 48000, feature: 'Panoramic Ocean View', bed: '1 King Bed' },
+        'lagoon-view-casita': { name: 'Lagoon View Casita', type: 'Lagoon Casita', image: '/images/resort/lagoon-view-casita.png', price: 34000, feature: 'Lagoon View Deck', bed: '1 King Bed + Daybed' },
+        'deluxe-garden-villa': { name: 'Deluxe Garden Villa', type: 'Garden Villa', image: '/images/resort/deluxe-garden-villa.png', price: 28000, feature: 'Private Garden Veranda', bed: '1 King Bed' },
+        'palm-studio-suite': { name: 'Palm Studio Suite', type: 'Studio Suite', image: '/images/resort/palm-studio-suite.png', price: 22000, feature: 'Palm Grove View', bed: '1 Queen Bed' },
+        'winter-sun-pool-villa': { name: 'Winter Sun Pool Villa', type: 'Seasonal Villa', image: '/images/resort/winter-sun-escape.png', price: 58000, feature: 'Ocean-View Pool Deck', bed: '1 King Bed' },
+        'seaside-romance-suite': { name: 'Seaside Romance Suite', type: 'Romance Suite', image: '/images/resort/seaside-romance-retreat.png', price: 64000, feature: 'Private Sunset Terrace', bed: '1 King Bed' },
+        'reef-overwater-spa-villa': { name: 'Reef Overwater Spa Villa', type: 'Spa Villa', image: '/images/resort/reef-overwater-spa-villa.png', price: 90000, feature: 'Outdoor Soaking Bath', bed: '1 King Bed + Lounge' },
+        'golden-tide-beach-villa': { name: 'Golden Tide Beach Villa', type: 'Beach Villa', image: '/images/resort/golden-tide-beach-villa.png', price: 86000, feature: 'Sunset Dining Terrace', bed: '2 King Beds' },
+        'coral-horizon-overwater-villa': { name: 'Coral Horizon Overwater Villa', type: 'Overwater Villa', image: '/images/resort/overwater-wellness-ritual.png', price: 92000, feature: 'Direct Reef Access', bed: '1 King Bed + Lounge' },
+    };
+    const formatMoney = (value) => `PHP ${new Intl.NumberFormat('en-PH').format(value)}`;
+    const formatStayDate = (value) => {
+        if (!value) return 'Date pending';
+        const date = new Date(`${value}T00:00:00`);
+        return Number.isNaN(date.getTime()) ? 'Date pending' : new Intl.DateTimeFormat('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
+    };
+    const hydrateReservationPages = () => {
+        if (!['/reservation-cart', '/guest-payment', '/booking-confirmation'].includes(window.location.pathname)) return;
+        let reservation = null;
+        try {
+            reservation = JSON.parse(window.localStorage.getItem(window.location.pathname === '/booking-confirmation' ? 'praisty_latest_reservation' : 'praisty_pending_reservation') || 'null');
+        } catch {
+            reservation = null;
+        }
+        const room = roomCatalog[reservation?.room_slug];
+        if (!room) return;
+        const checkIn = formatStayDate(reservation.check_in);
+        const checkOut = formatStayDate(reservation.check_out);
+        const nights = reservation.check_in && reservation.check_out
+            ? Math.max(1, Math.round((new Date(`${reservation.check_out}T00:00:00`) - new Date(`${reservation.check_in}T00:00:00`)) / 86400000))
+            : 1;
+        const guests = Number(reservation.guests || 1);
+        const stayTotal = room.price * nights;
+        const resortFee = Math.round(stayTotal * 0.05);
+        const taxes = Math.round(stayTotal * 0.09);
+        const total = stayTotal + resortFee + taxes;
+        const main = document.querySelector('main');
+        const images = [...(main?.querySelectorAll('img[src*="/images/resort/"]') || [])];
+        images[0]?.setAttribute('src', room.image);
+        images[0]?.setAttribute('alt', room.name);
+
+        if (window.location.pathname === '/reservation-cart') {
+            const card = main?.querySelector('section');
+            const title = card?.querySelector('h2');
+            if (title) title.textContent = room.name;
+            if (title?.previousElementSibling) title.previousElementSibling.textContent = room.type;
+            const dateChip = [...(card?.querySelectorAll('span') || [])].find((element) => element.textContent.includes(' - '));
+            if (dateChip) dateChip.childNodes[dateChip.childNodes.length - 1].textContent = `${checkIn} - ${checkOut} (${nights} ${nights === 1 ? 'Night' : 'Nights'})`;
+            const featureChip = [...(card?.querySelectorAll('span') || [])].find((element) => element.textContent.includes('Direct Lagoon Access'));
+            if (featureChip) featureChip.childNodes[featureChip.childNodes.length - 1].textContent = room.feature;
+            const editLink = card?.querySelector('a[href^="/rooms/"]');
+            if (editLink) editLink.href = `/rooms/${reservation.room_slug}#reservation`;
+            const rate = [...(card?.querySelectorAll('span') || [])].find((element) => element.textContent.includes('Nightly rate:'));
+            if (rate) rate.textContent = `Nightly rate: ${formatMoney(room.price)} x ${nights} nights`;
+            const summary = main?.querySelector('#total-value');
+            if (summary) { summary.textContent = formatMoney(total); summary.dataset.base = total; }
+        }
+
+        if (window.location.pathname === '/guest-payment') {
+            const title = main?.querySelector('aside h3');
+            if (title) title.textContent = room.name;
+            if (title?.previousElementSibling) title.previousElementSibling.textContent = room.type;
+            const dateText = [...(main?.querySelectorAll('aside p') || [])].find((element) => element.textContent.includes(' - '));
+            if (dateText) dateText.textContent = `${checkIn} - ${checkOut}`;
+            const nightText = [...(main?.querySelectorAll('aside p') || [])].find((element) => element.textContent.includes('nights'));
+            if (nightText) nightText.textContent = `${nights} ${nights === 1 ? 'night' : 'nights'} · ${guests} ${guests === 1 ? 'guest' : 'guests'}`;
+        }
+
+        if (window.location.pathname === '/booking-confirmation') {
+            const title = main?.querySelector('article h2');
+            if (title) title.textContent = room.name;
+            const values = main?.querySelectorAll('article .grid p.mt-1');
+            if (values?.length >= 4) {
+                values[0].textContent = checkIn;
+                values[1].textContent = checkOut;
+                values[2].textContent = `${nights} ${nights === 1 ? 'Night' : 'Nights'}`;
+                values[3].textContent = `${guests} ${guests === 1 ? 'Guest' : 'Guests'}`;
+            }
+        }
+    };
+    hydrateReservationPages();
+
     if (window.location.pathname === '/guest-login' && new URLSearchParams(window.location.search).has('created')) {
         const form = document.querySelector('form');
 
