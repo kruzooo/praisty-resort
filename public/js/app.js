@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
         images[0]?.setAttribute('alt', room.name);
 
         if (window.location.pathname === '/reservation-cart') {
-            const card = main?.querySelector('section');
+            const card = main?.querySelector('section.overflow-hidden');
             const title = card?.querySelector('h2');
             if (title) title.textContent = room.name;
             if (title?.previousElementSibling) title.previousElementSibling.textContent = room.type;
@@ -346,6 +346,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (rate) rate.textContent = `Nightly rate: ${formatMoney(room.price)} x ${nights} nights`;
             const summary = main?.querySelector('#total-value');
             if (summary) { summary.textContent = formatMoney(total); summary.dataset.base = total; }
+            const summaryRows = [...(main?.querySelectorAll('aside .my-6 > div.flex.justify-between') || [])];
+            if (summaryRows.length >= 3) {
+                summaryRows[0].firstElementChild.textContent = `Accommodation (${nights} ${nights === 1 ? 'night' : 'nights'})`;
+                summaryRows[0].lastElementChild.textContent = formatMoney(stayTotal);
+                summaryRows[1].lastElementChild.textContent = formatMoney(resortFee);
+                summaryRows[2].lastElementChild.textContent = formatMoney(taxes);
+            }
         }
 
         if (window.location.pathname === '/guest-payment') {
