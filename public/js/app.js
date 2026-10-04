@@ -1,5 +1,11 @@
 // Crossfade duplicate layers before the clip ends to soften the loop transition.
 document.addEventListener('DOMContentLoaded', () => {
+    if (window.location.pathname === '/customer-dashboard') {
+        document.querySelectorAll('nav a[href="#itinerary"], nav a[href="#privileges"]').forEach((link) => link.remove());
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
     const videos = Array.from(document.querySelectorAll('[data-hero-video]'));
     const toggle = document.getElementById('hero-video-toggle');
     const toggleIcon = document.getElementById('hero-video-toggle-icon');
