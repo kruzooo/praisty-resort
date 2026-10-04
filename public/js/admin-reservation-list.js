@@ -13,9 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const roomName = (reservation) => reservation.room_name || String(reservation.room_slug || 'Selected accommodation')
         .replace(/[-_]+/g, ' ')
         .replace(/\b\w/g, (letter) => letter.toUpperCase());
-    const formatDate = (value) => value
-        ? new Intl.DateTimeFormat('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(`${value}T00:00:00`))
-        : 'Dates pending';
+    const formatDate = (value) => {
+        if (!value) return 'Dates pending';
+        const text = String(value);
+        const date = new Date(text.length > 10 ? text : `${text}T00:00:00`);
+        return Number.isNaN(date.getTime())
+            ? 'Dates pending'
+            : new Intl.DateTimeFormat('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
+    };
     const statusStyle = {
         processing: 'bg-amber-50 text-amber-800',
         booked: 'bg-green-50 text-secondary',
@@ -36,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const load = async () => {
         try {
-            const response = await fetch(`/api/reservations?code=${encodeURIComponent(code)}`, { headers: { Accept: 'application/json', 'x-admin-code': code }, cache: 'no-store' });
+            const response = await fetch(`/api/reservations?code=${encodeURIComponent(code)}&t=${Date.now()}`, { headers: { Accept: 'application/json', 'x-admin-code': code }, cache: 'no-store' });
             if (!response.ok) throw new Error('Reservation feed unavailable');
             const data = await response.json();
             render(data.reservations || []);
@@ -46,5 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     load();
-    window.setInterval(load, 10000);
+    window.setInterval(load, 2000);
+    window.addEventListener('focus', load);
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') load();
+    });
 });
