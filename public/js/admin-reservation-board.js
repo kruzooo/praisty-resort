@@ -90,9 +90,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    let refreshInFlight = false;
     const loadReservations = async (attempt = 0) => {
+        if (refreshInFlight && attempt === 0) return;
+        if (attempt === 0) refreshInFlight = true;
         try {
-            const path = isStaticVercel ? `/api/reservations?code=${encodeURIComponent(adminCode)}` : '/admin/reservations/feed';
+            const path = isStaticVercel
+                ? `/api/reservations?code=${encodeURIComponent(adminCode)}&t=${Date.now()}`
+                : '/admin/reservations/feed';
             const headers = { Accept: 'application/json' };
             if (isStaticVercel) headers['x-admin-code'] = adminCode;
             const controller = new AbortController();
@@ -109,9 +114,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             tableBody.innerHTML = '<tr><td class="px-4 py-8 text-center text-sm text-error" colspan="5">Reservations are temporarily unavailable. Reconnecting automatically...</td></tr>';
+        } finally {
+            if (attempt === 0) refreshInFlight = false;
         }
     };
 
     loadReservations();
-    if (isStaticVercel) window.setInterval(loadReservations, 10000);
+    if (isStaticVercel) {
+        window.setInterval(() => loadReservations(), 2000);
+        window.addEventListener('focus', () => loadReservations());
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') loadReservations();
+        });
+    }
 });
