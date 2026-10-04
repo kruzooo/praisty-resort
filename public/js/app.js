@@ -326,7 +326,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     const payload = formPayload(form);
                     payload.guest = profile;
-                    payload.room_slug = action.split('/rooms/')[1]?.split('/')[0] || window.location.pathname.split('/rooms/')[1] || '';
+                    payload.room_slug = payload.room_slug
+                        || action.split('/rooms/')[1]?.split('/')[0]
+                        || window.location.pathname.split('/rooms/')[1]
+                        || '';
                     window.localStorage.setItem('praisty_pending_reservation', JSON.stringify(payload));
                     window.location.replace('/reservation-cart');
                 } catch (error) {
