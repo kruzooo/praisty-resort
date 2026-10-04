@@ -98,6 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
         'main > section',
         'main > article',
         'body > section:not(:first-of-type)',
+        '#stay > .mx-auto > .overflow-hidden',
+        '#itinerary article',
+        '#feedback > .mx-auto > .grid > *',
+        '#privileges > div',
+        'footer',
         '.experience-card',
         '.room-card',
         '.life-carousel',
@@ -448,8 +453,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             stayInner.classList.add('grid', 'gap-6');
             stayInner.querySelectorAll(':scope > .overflow-hidden').forEach((card, index) => { if (index > 0) card.remove(); });
-            reservations.slice(1).forEach(() => stayInner.appendChild(stayTemplate.cloneNode(true)));
+            reservations.slice(1).forEach(() => {
+                const card = stayTemplate.cloneNode(true);
+                card.classList.add('scroll-reveal');
+                stayInner.appendChild(card);
+            });
             [...stayInner.querySelectorAll(':scope > .overflow-hidden')].forEach((card, index) => renderStay(card, reservations[index]));
+            stayInner.querySelectorAll(':scope > .scroll-reveal').forEach((card, index) => {
+                window.requestAnimationFrame(() => window.setTimeout(() => card.classList.add('is-visible'), 100 + (index * 100)));
+            });
 
             const heroName = overview?.querySelector('h1');
             if (heroName) heroName.textContent = `Welcome to your private sanctuary, ${reservation.guest_name || profile?.name || 'Guest'}.`;
