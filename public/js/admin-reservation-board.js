@@ -20,7 +20,14 @@ document.addEventListener('DOMContentLoaded', () => {
         .replace(/[-_]+/g, ' ')
         .replace(/\b\w/g, (letter) => letter.toUpperCase());
     const stayDates = (reservation) => {
-        const format = (date) => date ? new Intl.DateTimeFormat('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(`${date}T00:00:00`)) : 'Dates pending';
+        const format = (date) => {
+            if (!date) return 'Dates pending';
+            const value = String(date);
+            const parsed = new Date(value.length > 10 ? value : `${value}T00:00:00`);
+            return Number.isNaN(parsed.getTime())
+                ? 'Dates pending'
+                : new Intl.DateTimeFormat('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }).format(parsed);
+        };
         return `${format(reservation.check_in)} - ${format(reservation.check_out)}`;
     };
     const updatedAt = (reservation) => reservation.created_at
