@@ -392,42 +392,66 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`/api/reservations?email=${encodeURIComponent(email)}&t=${Date.now()}`, { headers: { Accept: 'application/json' }, cache: 'no-store' });
             if (!response.ok) return;
             const data = await response.json();
-            const reservation = data.reservation;
-            const room = roomCatalog[reservation?.room_slug];
-            if (!reservation || !room) return;
-
-            const status = reservation.status === 'booked'
-                ? { label: 'Successfully Booked', classes: 'bg-green-100 text-green-900' }
-                : reservation.status === 'cancelled'
-                    ? { label: 'Cancelled', classes: 'bg-red-100 text-red-900' }
-                    : { label: 'Processing', classes: 'bg-amber-100 text-amber-900' };
-            const checkIn = formatStayDate(reservation.check_in);
-            const checkOut = formatStayDate(reservation.check_out);
-            const start = new Date(String(reservation.check_in).length > 10 ? reservation.check_in : `${reservation.check_in}T00:00:00`);
-            const end = new Date(String(reservation.check_out).length > 10 ? reservation.check_out : `${reservation.check_out}T00:00:00`);
-            const nights = Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) ? 1 : Math.max(1, Math.round((end - start) / 86400000));
-            const stayTotal = room.price * nights;
-            const total = stayTotal + Math.round(stayTotal * 0.05) + Math.round(stayTotal * 0.09);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const reservations = (data.reservations || (data.reservation ? [data.reservation] : []))
+                .filter((reservation) => {
+                    const checkout = new Date(String(reservation.check_out || '').length > 10 ? reservation.check_out : `${reservation.check_out}T00:00:00`);
+                    return Number.isNaN(checkout.getTime()) || checkout > today;
+                })
+                .filter((reservation) => roomCatalog[reservation.room_slug]);
+            const reservation = reservations[0];
             const overview = document.querySelector('#overview');
             const stay = document.querySelector('#stay');
+            const stayInner = stay?.querySelector(':scope > .mx-auto');
+            const stayTemplate = stayInner?.querySelector(':scope > .overflow-hidden');
+            if (!stayInner || !stayTemplate) return;
+
+            if (!reservations.length) {
+                stayInner.innerHTML = '<div class="rounded-xl bg-white p-8 text-center shadow-sm md:p-12"><span class="material-symbols-outlined text-5xl text-primary">travel_explore</span><h2 class="mt-4 font-headline text-4xl text-primary">Your next sanctuary awaits.</h2><p class="mx-auto mt-3 max-w-lg text-on-surface-variant">Your completed stays will clear from this view. Plan another escape whenever you are ready.</p><a class="mt-6 inline-flex items-center gap-2 rounded bg-primary px-5 py-3 text-xs font-semibold uppercase tracking-wider text-white" href="/rooms">Explore Rooms &amp; Villas <span class="material-symbols-outlined text-lg">arrow_forward</span></a></div>';
+                return;
+            }
+
+            const renderStay = (card, currentReservation) => {
+                const room = roomCatalog[currentReservation.room_slug];
+                const status = currentReservation.status === 'booked'
+                    ? { label: 'Successfully Booked', classes: 'bg-green-100 text-green-900' }
+                    : currentReservation.status === 'cancelled'
+                        ? { label: 'Cancelled', classes: 'bg-red-100 text-red-900' }
+                        : { label: 'Processing', classes: 'bg-amber-100 text-amber-900' };
+                const checkIn = formatStayDate(currentReservation.check_in);
+                const checkOut = formatStayDate(currentReservation.check_out);
+                const start = new Date(String(currentReservation.check_in).length > 10 ? currentReservation.check_in : `${currentReservation.check_in}T00:00:00`);
+                const end = new Date(String(currentReservation.check_out).length > 10 ? currentReservation.check_out : `${currentReservation.check_out}T00:00:00`);
+                const nights = Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) ? 1 : Math.max(1, Math.round((end - start) / 86400000));
+                const stayTotal = room.price * nights;
+                const total = stayTotal + Math.round(stayTotal * 0.05) + Math.round(stayTotal * 0.09);
+                const image = card.querySelector('img');
+                if (image) { image.src = room.image; image.alt = room.name; }
+                const title = card.querySelector('h2');
+                if (title) title.textContent = room.name;
+                if (title?.previousElementSibling) title.previousElementSibling.textContent = room.type;
+                const statusBadge = card.querySelector('.flex.items-center.justify-between.border-b span');
+                if (statusBadge) { statusBadge.textContent = status.label; statusBadge.className = `rounded px-2.5 py-1 text-xs font-semibold ${status.classes}`; }
+                const dates = card.querySelectorAll('.grid.grid-cols-2 p.mt-1');
+                if (dates?.length >= 2) { dates[0].textContent = checkIn; dates[1].textContent = checkOut; }
+                const summary = card.querySelector('.rounded-xl.bg-surface-container-low');
+                const summaryValues = summary?.querySelectorAll('span');
+                if (summaryValues?.length >= 4) { summaryValues[0].textContent = `${nights} ${nights === 1 ? 'night' : 'nights'} accommodation`; summaryValues[1].textContent = formatMoney(stayTotal); summaryValues[3].textContent = formatMoney(total); }
+            };
+
+            stayInner.classList.add('grid', 'gap-6');
+            stayInner.querySelectorAll(':scope > .overflow-hidden').forEach((card, index) => { if (index > 0) card.remove(); });
+            reservations.slice(1).forEach(() => stayInner.appendChild(stayTemplate.cloneNode(true)));
+            [...stayInner.querySelectorAll(':scope > .overflow-hidden')].forEach((card, index) => renderStay(card, reservations[index]));
+
             const heroName = overview?.querySelector('h1');
             if (heroName) heroName.textContent = `Welcome to your private sanctuary, ${reservation.guest_name || profile?.name || 'Guest'}.`;
             const reference = overview?.querySelector('section:first-of-type p span');
             if (reference) reference.textContent = `#${reservation.id}`;
+            const latestStatus = reservation.status === 'booked' ? 'Successfully Booked' : reservation.status === 'cancelled' ? 'Cancelled' : 'Processing';
             const topStatus = overview?.querySelector('.grid.gap-4 > div:first-child p:last-child');
-            if (topStatus) topStatus.textContent = status.label;
-            const image = stay?.querySelector('img');
-            if (image) { image.src = room.image; image.alt = room.name; }
-            const title = stay?.querySelector('h2');
-            if (title) title.textContent = room.name;
-            if (title?.previousElementSibling) title.previousElementSibling.textContent = room.type;
-            const statusBadge = stay?.querySelector('.flex.items-center.justify-between.border-b span');
-            if (statusBadge) { statusBadge.textContent = status.label; statusBadge.className = `rounded px-2.5 py-1 text-xs font-semibold ${status.classes}`; }
-            const dates = stay?.querySelectorAll('.grid.grid-cols-2 p.mt-1');
-            if (dates?.length >= 2) { dates[0].textContent = checkIn; dates[1].textContent = checkOut; }
-            const summary = stay?.querySelector('.rounded-xl.bg-surface-container-low');
-            const summaryValues = summary?.querySelectorAll('span');
-            if (summaryValues?.length >= 4) { summaryValues[0].textContent = `${nights} ${nights === 1 ? 'night' : 'nights'} accommodation`; summaryValues[1].textContent = formatMoney(stayTotal); summaryValues[3].textContent = formatMoney(total); }
+            if (topStatus) topStatus.textContent = reservations.length > 1 ? `${reservations.length} active reservations` : latestStatus;
         } catch {
             // Keep the dashboard's existing reservation view when the live feed is temporarily unavailable.
         }
