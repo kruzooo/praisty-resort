@@ -303,7 +303,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const formatMoney = (value) => `PHP ${new Intl.NumberFormat('en-PH').format(value)}`;
     const formatStayDate = (value) => {
         if (!value) return 'Date pending';
-        const date = new Date(`${value}T00:00:00`);
+        const text = String(value);
+        const date = new Date(text.length > 10 ? text : `${text}T00:00:00`);
         return Number.isNaN(date.getTime()) ? 'Date pending' : new Intl.DateTimeFormat('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
     };
     const hydrateReservationPages = () => {
@@ -378,6 +379,64 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     hydrateReservationPages();
+
+    const hydrateCustomerDashboard = async () => {
+        if (window.location.pathname !== '/customer-dashboard') return;
+        const profile = readProfile();
+        let storedReservation = null;
+        try { storedReservation = JSON.parse(localStorage.getItem('praisty_latest_reservation') || 'null'); } catch { /* Ignore malformed local state. */ }
+        const email = profile?.email || storedReservation?.guest_email || storedReservation?.email;
+        if (!email) return;
+
+        try {
+            const response = await fetch(`/api/reservations?email=${encodeURIComponent(email)}&t=${Date.now()}`, { headers: { Accept: 'application/json' }, cache: 'no-store' });
+            if (!response.ok) return;
+            const data = await response.json();
+            const reservation = data.reservation;
+            const room = roomCatalog[reservation?.room_slug];
+            if (!reservation || !room) return;
+
+            const status = reservation.status === 'booked'
+                ? { label: 'Successfully Booked', classes: 'bg-green-100 text-green-900' }
+                : reservation.status === 'cancelled'
+                    ? { label: 'Cancelled', classes: 'bg-red-100 text-red-900' }
+                    : { label: 'Processing', classes: 'bg-amber-100 text-amber-900' };
+            const checkIn = formatStayDate(reservation.check_in);
+            const checkOut = formatStayDate(reservation.check_out);
+            const start = new Date(String(reservation.check_in).length > 10 ? reservation.check_in : `${reservation.check_in}T00:00:00`);
+            const end = new Date(String(reservation.check_out).length > 10 ? reservation.check_out : `${reservation.check_out}T00:00:00`);
+            const nights = Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) ? 1 : Math.max(1, Math.round((end - start) / 86400000));
+            const stayTotal = room.price * nights;
+            const total = stayTotal + Math.round(stayTotal * 0.05) + Math.round(stayTotal * 0.09);
+            const overview = document.querySelector('#overview');
+            const stay = document.querySelector('#stay');
+            const heroName = overview?.querySelector('h1');
+            if (heroName) heroName.textContent = `Welcome to your private sanctuary, ${reservation.guest_name || profile?.name || 'Guest'}.`;
+            const reference = overview?.querySelector('section:first-of-type p span');
+            if (reference) reference.textContent = `#${reservation.id}`;
+            const topStatus = overview?.querySelector('.grid.gap-4 > div:first-child p:last-child');
+            if (topStatus) topStatus.textContent = status.label;
+            const image = stay?.querySelector('img');
+            if (image) { image.src = room.image; image.alt = room.name; }
+            const title = stay?.querySelector('h2');
+            if (title) title.textContent = room.name;
+            if (title?.previousElementSibling) title.previousElementSibling.textContent = room.type;
+            const statusBadge = stay?.querySelector('.flex.items-center.justify-between.border-b span');
+            if (statusBadge) { statusBadge.textContent = status.label; statusBadge.className = `rounded px-2.5 py-1 text-xs font-semibold ${status.classes}`; }
+            const dates = stay?.querySelectorAll('.grid.grid-cols-2 p.mt-1');
+            if (dates?.length >= 2) { dates[0].textContent = checkIn; dates[1].textContent = checkOut; }
+            const summary = stay?.querySelector('.rounded-xl.bg-surface-container-low');
+            const summaryValues = summary?.querySelectorAll('span');
+            if (summaryValues?.length >= 4) { summaryValues[0].textContent = `${nights} ${nights === 1 ? 'night' : 'nights'} accommodation`; summaryValues[1].textContent = formatMoney(stayTotal); summaryValues[3].textContent = formatMoney(total); }
+        } catch {
+            // Keep the dashboard's existing reservation view when the live feed is temporarily unavailable.
+        }
+    };
+    hydrateCustomerDashboard();
+    if (window.location.pathname === '/customer-dashboard') {
+        window.setInterval(hydrateCustomerDashboard, 5000);
+        window.addEventListener('focus', hydrateCustomerDashboard);
+    }
 
     if (window.location.pathname === '/guest-login' && new URLSearchParams(window.location.search).has('created')) {
         const form = document.querySelector('form');
